@@ -1,26 +1,31 @@
-fx_version 'cerulean'
-game 'gta5'
+fx_version "cerulean"
+use_experimental_fxv2_oal "yes"
+lua54 "yes"
+game "gta5"
 
-name 'JLRP-RadioList'
-author 'Mahan#8183'
-description 'JolbakLifeRP Radio List : List of players in each radio for pma-voice'
+name "x-radiolist"
+version "0.0.0"
+description "Project-X Radio List : List of players in each radio for pma-voice"
 
-shared_scripts {
-	'Config.lua',
-}
-
-ui_page "ui/index.html"
+ui_page "web/index.html"
 
 files {
-	"ui/index.html"
+	"web/index.html"
+}
+
+dependencies {
+	"ox_lib",
+}
+
+shared_scripts {
+	"@ox_lib/init.lua",
+	"shared/*.lua",
 }
 
 server_script {
-	"Server/*.lua"
+	"server/*.lua"
 }
 
 client_script {
-	"Client/*.lua"
+	"client/*.lua"
 }
-
-

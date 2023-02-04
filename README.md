@@ -1,4 +1,4 @@
-<h1 align="center"><b>JLRP-RadioList</b></h1>
+<h1 align="center"><b>X-RADIOLIST</b></h1>
 <h3 align="center">Radio List To Be Used With PMA-VOICE In FiveM</h3>
 <h4 align="center">Shows The List of Players In a Radio Frequency</h4>
 <br>
@@ -15,17 +15,10 @@
 
 <hr>
 
-## Changelog
-* V1.4 : Add config to let players customize how their name is displayed on the radio list
-* V1.3 : Add config to let players hide/show the list
-* V1.2 : Add config to use RP name for QB-Core
-* V1.1 : Add config to use RP name for ESX-Legacy
-* V1.0 : Initial creation of the script
-
 <hr>
 <br><h3 align='center'>Legal Notices</h3>
 <table><tr><td>
-Copyright (C) 2022 Mahan Moulaei
+Copyright (C) 2022-2023 Project-X (Mahan Moulaei)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
