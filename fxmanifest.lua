@@ -4,7 +4,7 @@ lua54       "yes"
 game        "gta5"
 
 name        "x-radiolist"
-version     "0.8.0"
+version     "0.9.0"
 repository  "https://github.com/XProject/x-radiolist"
 description "Project-X Radio List : List of players in each radio channels to be used with pma-voice"
 

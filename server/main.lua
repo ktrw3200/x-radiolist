@@ -10,7 +10,7 @@ if Config.UseRPName then
     if GetResourceState("es_extended"):find("start") then
         Framework.Object = exports["es_extended"]:getSharedObject()
         Framework.Initial = "esx"
-        Framework.GetPlayer = Framework.Object.Functions.GetPlayer
+        Framework.GetPlayer = Framework.Object.GetPlayerFromId
         Framework.GetPlayerName = function(source)
             local xPlayer = Framework.GetPlayer(source)
             return xPlayer and xPlayer.getName() or nil
@@ -39,7 +39,7 @@ if Config.UseRPName then
     elseif GetResourceState("JLRP-Framework"):find("start") then
         Framework.Object = exports["JLRP-Framework"]:getSharedObject()
         Framework.Initial = "jlrp"
-        Framework.GetPlayer = Framework.Object.Functions.GetPlayer
+        Framework.GetPlayer = Framework.Object.GetPlayerFromId
         Framework.GetPlayerName = function(source)
             local xPlayer = Framework.GetPlayer(source)
             return xPlayer and xPlayer.getName() or nil
