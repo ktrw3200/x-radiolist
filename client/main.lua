@@ -1,5 +1,6 @@
 local playerServerID = GetPlayerServerId(PlayerId())
 local currentRadioChannel, currentRadioChannelName
+local radioListVisibility = true
 
 local function closeTheRadioList()
     SendNUIMessage({ clearRadioList = true })
@@ -47,7 +48,6 @@ AddEventHandler("pma-voice:radioActive", function(talkingState)
 end)
 
 if Config.LetPlayersChangeVisibilityOfRadioList then
-    local visibility = true
     ---@diagnostic disable-next-line: missing-parameter
     RegisterCommand(Config.RadioListVisibilityCommand,function()
         visibility = not visibility
@@ -58,4 +58,11 @@ end
 
 if Config.LetPlayersSetTheirOwnNameInRadio then
     TriggerEvent("chat:addSuggestion", "/"..Config.RadioListChangeNameCommand, "Customize your name to be shown in radio list", { { name = "customized name", help = "Enter your desired name to be shown in radio list" } })
+end
+
+if Config.HideRadioListVisibilityByDefault then
+    SetTimeout(1000, function()
+        radioListVisibility = false
+        modifyTheRadioListVisibility(radioListVisibility)
+    end)
 end

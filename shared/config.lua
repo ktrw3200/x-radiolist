@@ -4,6 +4,7 @@ Config.UseRPName = true 							-- If set to true, it uses either esx-legacy or q
 
 Config.LetPlayersChangeVisibilityOfRadioList = true	-- Let players to toggle visibility of the list
 Config.RadioListVisibilityCommand = "radiolist" 	-- Only works if Config.LetPlayersChangeVisibilityOfRadioList is set to true
+Config.HideRadioListVisibilityByDefault = false      -- If set to true and a player joins the server, don't show the radio list until the player execute the Config.RadioListVisibilityCommand command
 
 Config.LetPlayersSetTheirOwnNameInRadio = true		-- Let players to customize how their name is displayed on the list
 Config.ResetPlayersCustomizedNameOnExit = true		-- Only works if Config.LetPlayersSetTheirOwnNameInRadio is set to true - Removes customized name players set for themselves on their server exit

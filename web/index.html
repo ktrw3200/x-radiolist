@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>JLRP-RadioList</title>
+        <title>x-radiolist</title>
         
         <style>
             .radio-list-container {
                 position: absolute;
-                /*top: 1%;*/
                 top: 40%;
                 right: 0%;
                 text-align: right;
@@ -23,12 +22,8 @@
             }
         </style>
         <script type="text/javascript">
-            let speakerEnabled = true;
-            
             window.addEventListener("message", function(event) {
                 var item = event.data;
-                
-                
 
                 if (item.radioId != null) {
                     let radioListElem = document.getElementById("radio-list");
@@ -37,7 +32,6 @@
                         let listHeader = document.createElement("div");
 
                         listHeader.id = "radio-list-header";
-                        //listHeader.textContent = "\uD83D\uDCE1Radio List";
                         listHeader.textContent = "\uD83D\uDCE1Radio " + item.channel;
                         listHeader.style.textDecorationLine = "underline";
 
@@ -75,9 +69,9 @@
                 
                 if (item.changeVisibility) {
                     if (item.visible == true) {
-                        document.getElementById("radio-list").style.display = 'block';
+                        document.getElementById("radio-list").style.display = "block";
                     } else if (item.visible == false) {
-                        document.getElementById("radio-list").style.display = 'none';
+                        document.getElementById("radio-list").style.display = "none";
                     }
                 }
             });
