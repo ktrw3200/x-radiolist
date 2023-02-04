@@ -10,10 +10,10 @@ Config.ResetPlayersCustomizedNameOnExit = true		-- Only works if Config.LetPlaye
 Config.RadioListChangeNameCommand = "nameinradio" 	-- Only works if Config.LetPlayersSetTheirOwnNameInRadio is set to true
 
 Config.RadioChannelsWithName = {
-	["0"] = "Admin",
-	["1"] = "Police",
-	["2"] = "Sheriff",
-	["3"] = "Fbi",
-	["4"] = "Ambulance",
-	["5"] = "Artesh"
+    ["0"] = "Admin",
+    ["1"] = "Police",
+    ["2"] = "Sheriff",
+    ["3"] = "Fbi",
+    ["4"] = "Ambulance",
+    ["5"] = "Artesh"
 }

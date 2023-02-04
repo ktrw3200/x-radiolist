@@ -10,22 +10,22 @@ description "Project-X Radio List : List of players in each radio for pma-voice"
 ui_page "web/index.html"
 
 files {
-	"web/index.html"
+    "web/index.html"
 }
 
 dependencies {
-	"ox_lib",
+    "ox_lib",
 }
 
 shared_scripts {
-	"@ox_lib/init.lua",
-	"shared/*.lua",
+    "@ox_lib/init.lua",
+    "shared/*.lua",
 }
 
 server_script {
-	"server/*.lua"
+    "server/*.lua"
 }
 
 client_script {
-	"client/*.lua"
+    "client/*.lua"
 }
