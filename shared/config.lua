@@ -26,5 +26,5 @@ Config.LetPlayersOverrideRadioChannelsWithName = false  -- Let player change the
 Config.RadioChannelsWithName = {
     ["0"] = "Admin",                                    -- Every channels between 0 and 1 will be named "Admin"
     ["1"] = "Police",                                   -- Every channels between 1 and 2 will be named "Police"
-    ["2"] = "Ambulance",                                -- Every channels between 1 and 2 will be named "Ambulance"
+    ["2"] = "Ambulance",                                -- Every channels between 2 and 3 will be named "Ambulance"
 }
