@@ -1,11 +1,12 @@
-fx_version "cerulean"
-use_experimental_fxv2_oal "yes"
-lua54 "yes"
-game "gta5"
+fx_version  "cerulean"
+use_experimental_fxv2_oal   "yes"
+lua54       "yes"
+game        "gta5"
 
-name "x-radiolist"
-version "0.0.0"
-description "Project-X Radio List : List of players in each radio for pma-voice"
+name        "x-radiolist"
+version     "0.8.0"
+repository  "https://github.com/XProject/x-radiolist"
+description "Project-X Radio List : List of players in each radio channels to be used with pma-voice"
 
 ui_page "web/index.html"
 
@@ -14,12 +15,12 @@ files {
 }
 
 dependencies {
-    "ox_lib",
+    "ox_lib"
 }
 
 shared_scripts {
     "@ox_lib/init.lua",
-    "shared/*.lua",
+    "shared/*.lua"
 }
 
 server_script {
