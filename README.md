@@ -8,7 +8,7 @@
 * Can be used as standalone
 * Config to show players’ RP name (needs framework integration - works with ESX-Legacy & QB-Core by default)
 * Changes the color of each player when they talk on radio
-* ~~Ability to name radio channels in config (e.g. all frequencies between 0 and 1 called "Admin Radio", between 1 and 2 called "Police Radio" & etc)~~ (this needs a rework - not working at the moment <b>: TODO...</b>)
+* Ability to name radio channels in config (e.g. all frequencies between 0 and 1 called "Admin", between 1 and 2 called "Police" & etc)
 * Ability to toggle visibility of the list for self
 * Ability to customize self name on the radio list
 * Super easy to integrate other frameworks compatibility
@@ -22,6 +22,7 @@
 * Config to let players modify name of the radio channels
 * Config to show radio members server id next to their name on the list
 * Ability to use QB callsign metadata as name on radio while on duty
+* Ability to let players change/override the name of radio channels that are defined in Config.RadioChannelsWithName
 * ~~Let admins see the members of each radio frequency~~ (<b>TODO...</b>)
 
 <hr>

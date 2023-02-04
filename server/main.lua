@@ -95,6 +95,10 @@ local function resetPlayerName(source)
     refreshRadioForPlayer(source)
 end
 
+local function getRadioChannelName(radioChannel)
+    return customRadioNames[tostring(radioChannel)] or Config.RadioChannelsWithName[tostring(math.floor(radioChannel))] or radioChannel
+end
+
 lib.callback.register(Shared.Callback.getPlayersInRadio, function(source, radioChannel)
     local playersInRadio = {}
     if not source then return playersInRadio end
@@ -103,7 +107,7 @@ lib.callback.register(Shared.Callback.getPlayersInRadio, function(source, radioC
     for player in pairs(pma_voice:getPlayersInRadioChannel(radioChannel)) do
         playersInRadio[player] = getPlayerName(player)
     end
-    local radioChannelName = customRadioNames[tostring(radioChannel)] or radioChannel
+    local radioChannelName = getRadioChannelName(radioChannel)
     return playersInRadio, radioChannel, radioChannelName
 end)
 
@@ -137,6 +141,13 @@ if Config.LetPlayersChangeRadioChannelsName then
             end
             local customizedName = rawCommand:sub(argumentStartIndex)
             if customizedName ~= "" and customizedName ~= " " and customizedName ~= nil then
+                if not Config.LetPlayersOverrideRadioChannelsWithName and Config.RadioChannelsWithName[tostring(math.floor(currentRadioChannel))] then
+                    return TriggerClientEvent("ox_lib:notify", source, {
+                        title = "You are not permitted to change this radio channel name!",
+                        type = "error",
+                        duration = 5000
+                    })
+                end
                 customRadioNames[tostring(currentRadioChannel)] = customizedName
                 for player in pairs(pma_voice:getPlayersInRadioChannel(currentRadioChannel)) do
                     refreshRadioForPlayer(player)

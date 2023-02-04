@@ -21,11 +21,10 @@ Config.JobsWithCallsign = {                             -- It only detects calls
     ["ambulance"] = true,
 }
 
+Config.LetPlayersOverrideRadioChannelsWithName = false  -- Let player change the name of radio channels that are in Config.RadioChannelsWithName => Only works if Config.LetPlayersChangeRadioChannelsName is set to true
+
 Config.RadioChannelsWithName = {
-    ["0"] = "Admin",
-    ["1"] = "Police",
-    ["2"] = "Sheriff",
-    ["3"] = "Fbi",
-    ["4"] = "Ambulance",
-    ["5"] = "Artesh"
+    ["0"] = "Admin",                                    -- Every channels between 0 and 1 will be named "Admin"
+    ["1"] = "Police",                                   -- Every channels between 1 and 2 will be named "Police"
+    ["2"] = "Ambulance",                                -- Every channels between 1 and 2 will be named "Ambulance"
 }
