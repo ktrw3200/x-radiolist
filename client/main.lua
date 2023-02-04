@@ -35,16 +35,16 @@ RegisterNetEvent("pma-voice:syncRadioData", function()
     playersInRadio = nil
 end)
 
--- set talkingState on radio for another radio members
-RegisterNetEvent("pma-voice:setTalkingOnRadio")
-AddEventHandler("pma-voice:setTalkingOnRadio", function(source, talkingState)
-    SendNUIMessage({ radioId = source, radioTalking = talkingState })
-end)
-
 -- set talkingState on radio for self
 RegisterNetEvent("pma-voice:radioActive")
 AddEventHandler("pma-voice:radioActive", function(talkingState)
     SendNUIMessage({ radioId = playerServerID, radioTalking = talkingState })
+end)
+
+-- set talkingState on radio for other radio members
+RegisterNetEvent("pma-voice:setTalkingOnRadio")
+AddEventHandler("pma-voice:setTalkingOnRadio", function(source, talkingState)
+    SendNUIMessage({ radioId = source, radioTalking = talkingState })
 end)
 
 if Config.LetPlayersChangeVisibilityOfRadioList then

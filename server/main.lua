@@ -1,103 +1,58 @@
 local pma_voice = exports["pma-voice"]
-local Framework = nil
-local Core = nil
+local Framework = {}
+local customPlayerNames = {}
+local customRadioNames = {}
 
 if Config.UseRPName then
-    if GetResourceState("es_extended") ~= "missing" then
-        Framework = "ESX"
-        Core = exports["es_extended"]:getSharedObject()
-    elseif GetResourceState("qb-core") ~= "missing" then
-        Framework = "QB"
-        Core = exports["qb-core"]:GetCoreObject()
-    elseif GetResourceState("JLRP-Framework") ~= "missing" then
-        Framework = "JLRP"
-        Core = exports["JLRP-Framework"]:getSharedObject()
+    if GetResourceState("es_extended"):find("start") then
+        Framework.Object = exports["es_extended"]:getSharedObject()
+        Framework.Initial = "esx"
+        Framework.GetPlayer = Framework.Object.Functions.GetPlayer
+        Framework.GetPlayerName = function(source)
+            local xPlayer = Framework.GetPlayer(source)
+            return xPlayer and xPlayer.getName() or nil
+        end
+    elseif GetResourceState("qb-core"):find("start") then
+        Framework.Object = exports["qb-core"]:GetCoreObject()
+        Framework.Initial = "qb"
+        Framework.GetPlayer = Framework.Object.Functions.GetPlayer
+        Framework.GetPlayerName = function(source)
+            local xPlayer = Framework.GetPlayer(source)
+            return xPlayer and ("%s %s"):format(xPlayer.PlayerData.charinfo.firstname, xPlayer.PlayerData.charinfo.lastname) or nil
+        end
+    elseif GetResourceState("JLRP-Framework"):find("start") then
+        Framework.Object = exports["JLRP-Framework"]:getSharedObject()
+        Framework.Initial = "jlrp"
+        Framework.GetPlayer = Framework.Object.Functions.GetPlayer
+        Framework.GetPlayerName = function(source)
+            local xPlayer = Framework.GetPlayer(source)
+            return xPlayer and xPlayer.getName() or nil
+        end
     end
+    Framework.Object = nil -- free up the memory
 end
 
-local CustomNames = {}
-local RadioNames = {}
-
-AddEventHandler("playerDropped", function()
-    local src = source
-    
-    local currentRadioChannel = Player(src).state.currentRadioChannel
-    
-    local playersInCurrentRadioChannel = CreateFullRadioListOfChannel(currentRadioChannel)
-    for _, player in pairs(playersInCurrentRadioChannel) do
-        --if player.Source ~= src then
-            TriggerClientEvent("JLRP-RadioList:Client:SyncRadioChannelPlayers", player.Source, src, 0, playersInCurrentRadioChannel)
-        --end
-    end
-    playersInCurrentRadioChannel = {}
-    
-    if Config.LetPlayersSetTheirOwnNameInRadio and Config.ResetPlayersCustomizedNameOnExit then
-        local playerIdentifier = GetIdentifier(src)
-        if CustomNames[playerIdentifier] and CustomNames[playerIdentifier] ~= nil then
-            CustomNames[playerIdentifier] = nil
-        end
-    end
-end)
-
-function GetPlayerNameForRadio(source)
-    if Config.LetPlayersSetTheirOwnNameInRadio then
-        local playerIdentifier = GetIdentifier(source)
-        if CustomNames[playerIdentifier] then
-            return CustomNames[playerIdentifier]
-        end
-    end
-
-    local name = nil
-    if Config.UseRPName then
-        if Framework == "ESX" then
-            if xPlayer then
-                name = Core.GetPlayerFromId(source)?.getName()
-            end
-        elseif Framework == "QB" then
-            local xPlayer = Core.Functions.GetPlayer(source)
-            if xPlayer then
-                name = xPlayer.PlayerData.charinfo.firstname.." "..xPlayer.PlayerData.charinfo.lastname
-            end
-        elseif Framework == "JLRP" then
-            if xPlayer then
-                name = Core.GetPlayerFromId(source)?.getName()
-            end
-        end
-        if name == nil then -- extra check to make sure player sends a name to client
-            name = GetPlayerName(source)
-        end
-    else
-        name = GetPlayerName(source)
-    end
-    Player(source).state:set(Shared.State.nameInRadio, name, true)
-    return name
-end
-
-if Config.LetPlayersSetTheirOwnNameInRadio then
-    local commandLength = string.len(Config.RadioListChangeNameCommand)
-    local argumentStartIndex = commandLength + 2
-    RegisterCommand(Config.RadioListChangeNameCommand, function(source, _, rawCommand)
-        if source and source > 0 then
-            local customizedName = rawCommand:sub(argumentStartIndex)
-            if customizedName ~= "" and customizedName ~= " " and customizedName ~= nil then
-                CustomNames[GetIdentifier(source)] = customizedName
-                Player(source).state:set(Shared.State.nameInRadio, customizedName, true)
-                local currentRadioChannel = Player(source).state.radioChannel
-                if currentRadioChannel > 0 then
-                    Connect(source, currentRadioChannel, currentRadioChannel)
-                end
-            end
-        end
-    end, false)
-end
-
-function GetIdentifier(source)
+local function getPlayerIdentifier(source)
+    local identifier
     for _, v in ipairs(GetPlayerIdentifiers(source)) do
         if string.match(v, "license:") then
-            local identifier = string.gsub(v, "license:", "")
-            return identifier
+            identifier = string.gsub(v, "license:", "")
+            break
         end
     end
+    return identifier
+end
+
+local function getPlayerName(source)
+    if Config.LetPlayersSetTheirOwnNameInRadio then
+        local playerIdentifier = getPlayerIdentifier(source)
+        if customPlayerNames[playerIdentifier] then
+            return customPlayerNames[playerIdentifier]
+        end
+    end
+    local playerName = (Config.UseRPName and (Framework.GetPlayerName(source) or GetPlayerName(source))) or (not Config.UseRPName and GetPlayerName(source))
+    Player(source).state:set(Shared.State.nameInRadio, playerName, true)
+    return playerName
 end
 
 lib.callback.register(Shared.Callback.getPlayersInRadio, function(source, radioChannel)
@@ -106,12 +61,41 @@ lib.callback.register(Shared.Callback.getPlayersInRadio, function(source, radioC
     radioChannel = radioChannel or Player(source).state.radioChannel
     if not radioChannel then return playersInRadio end
     for player in pairs(pma_voice:getPlayersInRadioChannel(radioChannel)) do
-        playersInRadio[player] = GetPlayerNameForRadio(player)
+        playersInRadio[player] = getPlayerName(player)
     end
-    local radioChannelName = RadioNames[tostring(radioChannel)] or radioChannel
+    local radioChannelName = customRadioNames[tostring(radioChannel)] or radioChannel
     return playersInRadio, radioChannel, radioChannelName
 end)
 
-lib.callback.register(Shared.Callback.getPlayerName, function(source, player)
-    return GetPlayerNameForRadio(player)
+lib.callback.register(Shared.Callback.getPlayerName, function(_, player)
+    return getPlayerName(player)
+end)
+
+if Config.LetPlayersSetTheirOwnNameInRadio then
+    local commandLength = string.len(Config.RadioListChangeNameCommand)
+    local argumentStartIndex = commandLength + 2
+    RegisterCommand(Config.RadioListChangeNameCommand, function(source, _, rawCommand)
+        if source and source > 0 then
+            local customizedName = rawCommand:sub(argumentStartIndex)
+            if customizedName ~= "" and customizedName ~= " " and customizedName ~= nil then
+                customPlayerNames[getPlayerIdentifier(source)] = customizedName
+                Player(source).state:set(Shared.State.nameInRadio, customizedName, true)
+                local currentRadioChannel = Player(source).state.radioChannel
+                if currentRadioChannel then
+                    pma_voice:setPlayerRadio(source, 0)
+                    pma_voice:setPlayerRadio(source, currentRadioChannel)
+                end
+            end
+        end
+    end, false)
+end
+
+AddEventHandler("playerDropped", function()
+    local source = source
+    if Config.LetPlayersSetTheirOwnNameInRadio and Config.ResetPlayersCustomizedNameOnExit then
+        local playerIdentifier = getPlayerIdentifier(source)
+        if customPlayerNames[playerIdentifier] then
+            customPlayerNames[playerIdentifier] = nil
+        end
+    end
 end)
