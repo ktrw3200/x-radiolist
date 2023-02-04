@@ -2,6 +2,7 @@ local pma_voice = exports["pma-voice"]
 local Framework = {}
 local customPlayerNames = {}
 local customRadioNames = {}
+Config.PlayerServerIdPosition = (Config.PlayerServerIdPosition == "right" or Config.PlayerServerIdPosition == "left") and Config.PlayerServerIdPosition or "right"
 
 if Config.UseRPName then
     if GetResourceState("es_extended"):find("start") then
@@ -51,6 +52,10 @@ local function getPlayerName(source)
         end
     end
     local playerName = (Config.UseRPName and (Framework.GetPlayerName(source) or GetPlayerName(source))) or (not Config.UseRPName and GetPlayerName(source))
+    if Config.ShowPlayersServerIdNextToTheirName then
+        if Config.PlayerServerIdPosition == "left" then playerName = ("(%s) %s"):format(source, playerName)
+        elseif Config.PlayerServerIdPosition == "right" then playerName = ("%s (%s)"):format(playerName, source) end
+    end
     Player(source).state:set(Shared.State.nameInRadio, playerName, true)
     return playerName
 end
@@ -78,8 +83,17 @@ if Config.LetPlayersSetTheirOwnNameInRadio then
         if source and source > 0 then
             local customizedName = rawCommand:sub(argumentStartIndex)
             if customizedName ~= "" and customizedName ~= " " and customizedName ~= nil then
+                if Config.ShowPlayersServerIdNextToTheirName then
+                    if Config.PlayerServerIdPosition == "left" then customizedName = ("(%s) %s"):format(source, customizedName)
+                    elseif Config.PlayerServerIdPosition == "right" then customizedName = ("%s (%s)"):format(customizedName, source) end
+                end
                 customPlayerNames[getPlayerIdentifier(source)] = customizedName
                 Player(source).state:set(Shared.State.nameInRadio, customizedName, true)
+                TriggerClientEvent("ox_lib:notify", source, {
+                    title = ("You successfully changed your name on radio to %s"):format(customizedName),
+                    type = "success",
+                    duration = 5000
+                })
                 local currentRadioChannel = Player(source).state.radioChannel
                 if not currentRadioChannel or not (currentRadioChannel > 0) then return end
                 pma_voice:setPlayerRadio(source, 0)
@@ -96,7 +110,7 @@ if Config.LetPlayersChangeRadioChannelsName then
         if source and source > 0 then
             local currentRadioChannel = Player(source).state.radioChannel
             if not currentRadioChannel or not (currentRadioChannel > 0) then
-                return TriggerClientEvent("ox_lib:notify", source, {title = "You must be in a radio channel to modify its name", type="error"})
+                return TriggerClientEvent("ox_lib:notify", source, {title = "You must be in a radio channel to modify its name", type = "error"})
             end
             local customizedName = rawCommand:sub(argumentStartIndex)
             if customizedName ~= "" and customizedName ~= " " and customizedName ~= nil then
@@ -106,7 +120,7 @@ if Config.LetPlayersChangeRadioChannelsName then
                     pma_voice:setPlayerRadio(player, currentRadioChannel)
                     TriggerClientEvent("ox_lib:notify", player, {
                         title = ("Player %s changed the radio channel(%s)'s name to %s"):format(Player(source).state[Shared.State.nameInRadio], currentRadioChannel, customizedName),
-                        type="inform",
+                        type = "inform",
                         duration = 5000
                     })
                 end

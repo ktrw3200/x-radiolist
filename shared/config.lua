@@ -13,6 +13,9 @@ Config.RadioListChangeNameCommand = "nameinradio" 	    -- Only works if Config.L
 Config.LetPlayersChangeRadioChannelsName = true         -- Let players to change the name of the radio channels **they are currently joined in**
 Config.ModifyRadioChannelNameCommand = "nameofradio"    -- Changes the name of the radio channel **that the player is currently joined in** => this is a validation to prevent normal players from modifying the name of the restricted channels they don't have access to(such as police, & etc)
 
+Config.ShowPlayersServerIdNextToTheirName = true        -- Shows the players' server id next to their name on the radio list
+Config.PlayerServerIdPosition = "right"                 -- Position of player's server id next to their name on the radio list ("right" or "left") => Only works if Config.ShowPlayersServerIdNextToTheirName is set to true
+
 Config.RadioChannelsWithName = {
     ["0"] = "Admin",
     ["1"] = "Police",
