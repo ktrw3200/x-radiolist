@@ -8,12 +8,21 @@
 * Can be used as standalone
 * Config to show players’ RP name (needs framework integration - works with ESX-Legacy & QB-Core by default)
 * Changes the color of each player when they talk on radio
-* Ability to name radio channels in config (e.g. all frequencies between 0 and 1 called "Admin Radio", between 1 and 2 called "Police Radio" & etc)
+* ~~Ability to name radio channels in config (e.g. all frequencies between 0 and 1 called "Admin Radio", between 1 and 2 called "Police Radio" & etc)~~ (this needs a rework - not working at the moment <b>: TODO...</b>)
 * Ability to toggle visibility of the list for self
 * Ability to customize self name on the radio list
 * Super easy to integrate other frameworks compatibility
-
 <hr>
+
+### Changes in compare to <a href='https://github.com/mahanmoulaei/JLRP-RadioList'>JLRP-RadioList</a>
+* Performance increase
+* Bug fixes
+* Code cleanup + More code readability
+* Config to hide radio list visibility by default
+* Config to let players modify name of the radio channels
+* Config to show radio members server id next to their name on the list
+* Ability to use QB callsign metadata as name on radio while on duty
+* ~~Let admins see the members of each radio frequency~~ (<b>TODO...</b>)
 
 <hr>
 <br><h3 align='center'>Legal Notices</h3>
