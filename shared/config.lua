@@ -16,6 +16,11 @@ Config.ModifyRadioChannelNameCommand = "nameofradio"    -- Changes the name of t
 Config.ShowPlayersServerIdNextToTheirName = true        -- Shows the players' server id next to their name on the radio list
 Config.PlayerServerIdPosition = "right"                 -- Position of player's server id next to their name on the radio list ("right" or "left") => Only works if Config.ShowPlayersServerIdNextToTheirName is set to true
 
+Config.JobsWithCallsign = {                             -- It only detects callsign if your framework is "qb"
+    ["police"] = true,
+    ["ambulance"] = true,
+}
+
 Config.RadioChannelsWithName = {
     ["0"] = "Admin",
     ["1"] = "Police",

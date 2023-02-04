@@ -2,8 +2,10 @@ local pma_voice = exports["pma-voice"]
 local Framework = {}
 local customPlayerNames = {}
 local customRadioNames = {}
-Config.PlayerServerIdPosition = (Config.PlayerServerIdPosition == "right" or Config.PlayerServerIdPosition == "left") and Config.PlayerServerIdPosition or "right"
 
+local function isPlayerAllowedToChangeName(_, _)
+    return Config.LetPlayersSetTheirOwnNameInRadio
+end
 if Config.UseRPName then
     if GetResourceState("es_extended"):find("start") then
         Framework.Object = exports["es_extended"]:getSharedObject()
@@ -20,6 +22,19 @@ if Config.UseRPName then
         Framework.GetPlayerName = function(source)
             local xPlayer = Framework.GetPlayer(source)
             return xPlayer and ("%s %s"):format(xPlayer.PlayerData.charinfo.firstname, xPlayer.PlayerData.charinfo.lastname) or nil
+        end
+        isPlayerAllowedToChangeName = function(source, notify) -- override isPlayerAllowedToChangeName
+            local response = Config.LetPlayersSetTheirOwnNameInRadio
+            local xPlayer = Framework.GetPlayer(source)
+            if xPlayer then
+                if Config.JobsWithCallsign[xPlayer.PlayerData?.job?.name] and xPlayer.PlayerData?.job?.onduty then
+                    response = false
+                    if notify then
+                        TriggerClientEvent("ox_lib:notify", source, { title = "You cannot change your name on radio while on duty!", type = "error", duration = 5000 })
+                    end
+                end
+            end
+            return response
         end
     elseif GetResourceState("JLRP-Framework"):find("start") then
         Framework.Object = exports["JLRP-Framework"]:getSharedObject()
@@ -44,20 +59,40 @@ local function getPlayerIdentifier(source)
     return identifier
 end
 
+local function refreshRadioForPlayer(source)
+    local currentRadioChannel = Player(source).state.radioChannel
+    if not currentRadioChannel or not (currentRadioChannel > 0) then return end
+    pma_voice:setPlayerRadio(source, 0)
+    Wait(100)
+    pma_voice:setPlayerRadio(source, currentRadioChannel)
+end
+
+local function setPlayerName(source, newName)
+    local currentName = Player(source).state[Shared.State.nameInRadio]
+    if currentName and currentName == newName then return end
+    customPlayerNames[getPlayerIdentifier(source)] = newName
+    Player(source).state:set(Shared.State.nameInRadio, newName, true)
+    refreshRadioForPlayer(source)
+    TriggerClientEvent("ox_lib:notify", source, {
+        title = ("Your name on radio changed to %s"):format(newName),
+        type = "inform",
+        duration = 5000
+    })
+end
+
 local function getPlayerName(source)
-    if Config.LetPlayersSetTheirOwnNameInRadio then
-        local playerIdentifier = getPlayerIdentifier(source)
-        if customPlayerNames[playerIdentifier] then
-            return customPlayerNames[playerIdentifier]
-        end
+    local playerName = Player(source).state[Shared.State.nameInRadio]
+    if not playerName then
+        playerName = (Config.UseRPName and (Framework.GetPlayerName(source) or GetPlayerName(source))) or (not Config.UseRPName and GetPlayerName(source))
+        setPlayerName(source, playerName)
     end
-    local playerName = (Config.UseRPName and (Framework.GetPlayerName(source) or GetPlayerName(source))) or (not Config.UseRPName and GetPlayerName(source))
-    if Config.ShowPlayersServerIdNextToTheirName then
-        if Config.PlayerServerIdPosition == "left" then playerName = ("(%s) %s"):format(source, playerName)
-        elseif Config.PlayerServerIdPosition == "right" then playerName = ("%s (%s)"):format(playerName, source) end
-    end
-    Player(source).state:set(Shared.State.nameInRadio, playerName, true)
     return playerName
+end
+
+local function resetPlayerName(source)
+    Player(source).state:set(Shared.State.nameInRadio, nil, true)
+    getPlayerName(source)
+    refreshRadioForPlayer(source)
 end
 
 lib.callback.register(Shared.Callback.getPlayersInRadio, function(source, radioChannel)
@@ -83,21 +118,9 @@ if Config.LetPlayersSetTheirOwnNameInRadio then
         if source and source > 0 then
             local customizedName = rawCommand:sub(argumentStartIndex)
             if customizedName ~= "" and customizedName ~= " " and customizedName ~= nil then
-                if Config.ShowPlayersServerIdNextToTheirName then
-                    if Config.PlayerServerIdPosition == "left" then customizedName = ("(%s) %s"):format(source, customizedName)
-                    elseif Config.PlayerServerIdPosition == "right" then customizedName = ("%s (%s)"):format(customizedName, source) end
+                if isPlayerAllowedToChangeName(source, true) then
+                    setPlayerName(source, customizedName)
                 end
-                customPlayerNames[getPlayerIdentifier(source)] = customizedName
-                Player(source).state:set(Shared.State.nameInRadio, customizedName, true)
-                TriggerClientEvent("ox_lib:notify", source, {
-                    title = ("You successfully changed your name on radio to %s"):format(customizedName),
-                    type = "success",
-                    duration = 5000
-                })
-                local currentRadioChannel = Player(source).state.radioChannel
-                if not currentRadioChannel or not (currentRadioChannel > 0) then return end
-                pma_voice:setPlayerRadio(source, 0)
-                pma_voice:setPlayerRadio(source, currentRadioChannel)
             end
         end
     end, false)
@@ -116,8 +139,7 @@ if Config.LetPlayersChangeRadioChannelsName then
             if customizedName ~= "" and customizedName ~= " " and customizedName ~= nil then
                 customRadioNames[tostring(currentRadioChannel)] = customizedName
                 for player in pairs(pma_voice:getPlayersInRadioChannel(currentRadioChannel)) do
-                    pma_voice:setPlayerRadio(player, 0)
-                    pma_voice:setPlayerRadio(player, currentRadioChannel)
+                    refreshRadioForPlayer(player)
                     TriggerClientEvent("ox_lib:notify", player, {
                         title = ("Player %s changed the radio channel(%s)'s name to %s"):format(Player(source).state[Shared.State.nameInRadio], currentRadioChannel, customizedName),
                         type = "inform",
@@ -127,6 +149,22 @@ if Config.LetPlayersChangeRadioChannelsName then
             end
         end
     end, false)
+end
+
+if Framework.Initial == "qb" then
+    AddEventHandler("QBCore:Player:SetPlayerData", function(playerData)
+        local source = playerData.source
+        if not source then return end
+        local isAllowedToChangeName = isPlayerAllowedToChangeName(source, false)
+        local hasCallsignSetAsName = Player(source).state[Shared.State.callsignIsSet]
+        if not isAllowedToChangeName then
+            setPlayerName(source, playerData.metadata?.callsign or Player(source).state[Shared.State.nameInRadio])
+            Player(source).state:set(Shared.State.callsignIsSet, true)
+        elseif isAllowedToChangeName and hasCallsignSetAsName then
+            resetPlayerName(source)
+            Player(source).state:set(Shared.State.callsignIsSet, false)
+        end
+    end)
 end
 
 AddEventHandler("playerDropped", function()
