@@ -12,7 +12,7 @@ end
 
 RegisterNetEvent("pma-voice:addPlayerToRadio", function(playerId)
     if not currentRadioChannel or not (currentRadioChannel > 0) then return end
-    local playerName = Player(playerId).state[Shared.State.nameInRadio] or lib.callback.await(Shared.Callback.getPlayerName, false, playerId)
+    local playerName = Player(playerId).state[Shared.State.nameInRadio] --[[ or lib.callback.await(Shared.Callback.getPlayerName, false, playerId)]]
     SendNUIMessage({ self = playerId == playerServerID, radioId = playerId, radioName = playerName, channel = currentRadioChannelName })
 end)
 
@@ -65,4 +65,8 @@ if Config.HideRadioListVisibilityByDefault then
         radioListVisibility = false
         modifyTheRadioListVisibility(radioListVisibility)
     end)
+end
+
+if Config.LetPlayersChangeRadioChannelsName then
+    TriggerEvent("chat:addSuggestion", "/"..Config.ModifyRadioChannelNameCommand, "Modify the name of the radio channel you are currently in", { { name = "customized name", help = "Enter your desired name to set it as you current radio channel's name" } })
 end

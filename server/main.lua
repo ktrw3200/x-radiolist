@@ -81,9 +81,34 @@ if Config.LetPlayersSetTheirOwnNameInRadio then
                 customPlayerNames[getPlayerIdentifier(source)] = customizedName
                 Player(source).state:set(Shared.State.nameInRadio, customizedName, true)
                 local currentRadioChannel = Player(source).state.radioChannel
-                if currentRadioChannel then
-                    pma_voice:setPlayerRadio(source, 0)
-                    pma_voice:setPlayerRadio(source, currentRadioChannel)
+                if not currentRadioChannel or not (currentRadioChannel > 0) then return end
+                pma_voice:setPlayerRadio(source, 0)
+                pma_voice:setPlayerRadio(source, currentRadioChannel)
+            end
+        end
+    end, false)
+end
+
+if Config.LetPlayersChangeRadioChannelsName then
+    local commandLength = string.len(Config.ModifyRadioChannelNameCommand)
+    local argumentStartIndex = commandLength + 2
+    RegisterCommand(Config.ModifyRadioChannelNameCommand, function(source, _, rawCommand)
+        if source and source > 0 then
+            local currentRadioChannel = Player(source).state.radioChannel
+            if not currentRadioChannel or not (currentRadioChannel > 0) then
+                return TriggerClientEvent("ox_lib:notify", source, {title = "You must be in a radio channel to modify its name", type="error"})
+            end
+            local customizedName = rawCommand:sub(argumentStartIndex)
+            if customizedName ~= "" and customizedName ~= " " and customizedName ~= nil then
+                customRadioNames[tostring(currentRadioChannel)] = customizedName
+                for player in pairs(pma_voice:getPlayersInRadioChannel(currentRadioChannel)) do
+                    pma_voice:setPlayerRadio(player, 0)
+                    pma_voice:setPlayerRadio(player, currentRadioChannel)
+                    TriggerClientEvent("ox_lib:notify", player, {
+                        title = ("Player %s changed the radio channel(%s)'s name to %s"):format(Player(source).state[Shared.State.nameInRadio], currentRadioChannel, customizedName),
+                        type="inform",
+                        duration = 5000
+                    })
                 end
             end
         end
