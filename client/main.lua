@@ -4,6 +4,7 @@ local radioListVisibility = true
 
 local function closeTheRadioList()
     SendNUIMessage({ clearRadioList = true })
+    currentRadioChannel, currentRadioChannelName = nil, nil
 end
 
 local function modifyTheRadioListVisibility(state)
