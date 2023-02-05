@@ -61,8 +61,8 @@ end)
 if Config.LetPlayersChangeVisibilityOfRadioList then
     ---@diagnostic disable-next-line: missing-parameter
     RegisterCommand(Config.RadioListVisibilityCommand,function()
-        visibility = not visibility
-        modifyTheRadioListVisibility(visibility)
+        radioListVisibility = not radioListVisibility
+        modifyTheRadioListVisibility(radioListVisibility)
     end)
     TriggerEvent("chat:addSuggestion", "/"..Config.RadioListVisibilityCommand, "Show/Hide Radio List")
 end
