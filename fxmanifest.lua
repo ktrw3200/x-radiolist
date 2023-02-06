@@ -14,19 +14,16 @@ files {
     "web/index.html"
 }
 
-dependencies {
-    "ox_lib"
-}
-
 shared_scripts {
-    "@ox_lib/init.lua",
     "shared/*.lua"
 }
 
 server_script {
+    "module/**/server.lua",
     "server/*.lua"
 }
 
 client_script {
+    "module/**/client.lua",
     "client/*.lua"
 }

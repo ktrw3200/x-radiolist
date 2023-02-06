@@ -28,3 +28,10 @@ Config.RadioChannelsWithName = {
     ["1"] = "Police",                                   -- Every channels between 1 and 2 will be named "Police"
     ["2"] = "Ambulance",                                -- Every channels between 2 and 3 will be named "Ambulance"
 }
+
+Config.Notification = function(source, message, type)
+    TriggerClientEvent("ox_lib:notify", source, {title = message, type = type or "inform", duration = 5000})
+    -- TriggerClientEvent("t-notify:client:Custom", source, {title = message, style = type or "info", duration = 5000})
+    -- TriggerClientEvent("esx:showNotification", source, message, type or "info", 5000)
+    -- TriggerClientEvent("QBCore:Notify", source, message, type or "primary", 5000)
+end
