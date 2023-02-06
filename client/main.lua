@@ -20,10 +20,10 @@ local function addServerIdToPlayerName(serverId, playerName)
 end
 
 RegisterNetEvent("pma-voice:addPlayerToRadio", function(playerId)
-    if not currentRadioChannel or not (currentRadioChannel > 0) then return end
+    if not currentRadioChannel or not (currentRadioChannel > 0) or playerId == playerServerID then return end
     local playerName = Player(playerId).state[Shared.State.nameInRadio] or callback.await(Shared.Callback.getPlayerName, false, playerId)
     playerName = addServerIdToPlayerName(playerId, playerName)
-    SendNUIMessage({ self = playerId == playerServerID, radioId = playerId, radioName = playerName, channel = currentRadioChannelName })
+    SendNUIMessage({ radioId = playerId, radioName = playerName, channel = currentRadioChannelName })
 end)
 
 RegisterNetEvent("pma-voice:removePlayerFromRadio", function(playerId)
