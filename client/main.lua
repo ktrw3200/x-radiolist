@@ -21,7 +21,7 @@ end
 
 RegisterNetEvent("pma-voice:addPlayerToRadio", function(playerId)
     if not currentRadioChannel or not (currentRadioChannel > 0) then return end
-    local playerName = Player(playerId).state[Shared.State.nameInRadio] or lib.callback.await(Shared.Callback.getPlayerName, false, playerId)
+    local playerName = Player(playerId).state[Shared.State.nameInRadio] or callback.await(Shared.Callback.getPlayerName, false, playerId)
     playerName = addServerIdToPlayerName(playerId, playerName)
     SendNUIMessage({ self = playerId == playerServerID, radioId = playerId, radioName = playerName, channel = currentRadioChannelName })
 end)
@@ -38,7 +38,7 @@ end)
 RegisterNetEvent("pma-voice:syncRadioData", function()
     closeTheRadioList()
     local playersInRadio
-    playersInRadio, currentRadioChannel, currentRadioChannelName = lib.callback.await(Shared.Callback.getPlayersInRadio, false)
+    playersInRadio, currentRadioChannel, currentRadioChannelName = callback.await(Shared.Callback.getPlayersInRadio, false)
     for playerId, playerName in pairs(playersInRadio) do
         playerName = addServerIdToPlayerName(playerId, playerName)
         SendNUIMessage({ self = playerId == playerServerID, radioId = playerId, radioName = playerName, channel = currentRadioChannelName })

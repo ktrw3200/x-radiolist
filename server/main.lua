@@ -30,7 +30,7 @@ if Config.UseRPName then
                 if Config.JobsWithCallsign[xPlayer.PlayerData?.job?.name] and xPlayer.PlayerData?.job?.onduty then
                     response = false
                     if notify then
-                        TriggerClientEvent("ox_lib:notify", source, { title = "You cannot change your name on radio while on duty!", type = "error", duration = 5000 })
+                        Config.Notification(source, "You cannot change your name on radio while on duty!", "error")
                     end
                 end
             end
@@ -73,11 +73,7 @@ local function setPlayerName(source, newName)
     customPlayerNames[getPlayerIdentifier(source)] = newName
     Player(source).state:set(Shared.State.nameInRadio, newName, true)
     refreshRadioForPlayer(source)
-    TriggerClientEvent("ox_lib:notify", source, {
-        title = ("Your name on radio changed to %s"):format(newName),
-        type = "inform",
-        duration = 5000
-    })
+    Config.Notification(source, ("Your name on radio changed to %s"):format(newName))
 end
 
 local function getPlayerName(source)
@@ -99,7 +95,7 @@ local function getRadioChannelName(radioChannel)
     return customRadioNames[tostring(radioChannel)] or Config.RadioChannelsWithName[tostring(math.floor(radioChannel))] or radioChannel
 end
 
-lib.callback.register(Shared.Callback.getPlayersInRadio, function(source, radioChannel)
+callback.register(Shared.Callback.getPlayersInRadio, function(source, radioChannel)
     local playersInRadio = {}
     if not source then return playersInRadio end
     radioChannel = radioChannel or Player(source).state.radioChannel
@@ -111,7 +107,7 @@ lib.callback.register(Shared.Callback.getPlayersInRadio, function(source, radioC
     return playersInRadio, radioChannel, radioChannelName
 end)
 
-lib.callback.register(Shared.Callback.getPlayerName, function(_, player)
+callback.register(Shared.Callback.getPlayerName, function(_, player)
     return getPlayerName(player)
 end)
 
@@ -137,25 +133,17 @@ if Config.LetPlayersChangeRadioChannelsName then
         if source and source > 0 then
             local currentRadioChannel = Player(source).state.radioChannel
             if not currentRadioChannel or not (currentRadioChannel > 0) then
-                return TriggerClientEvent("ox_lib:notify", source, {title = "You must be in a radio channel to modify its name", type = "error"})
+                return Config.Notification(source, "You must be in a radio channel to modify its name!", "error")
             end
             local customizedName = rawCommand:sub(argumentStartIndex)
             if customizedName ~= "" and customizedName ~= " " and customizedName ~= nil then
                 if not Config.LetPlayersOverrideRadioChannelsWithName and Config.RadioChannelsWithName[tostring(math.floor(currentRadioChannel))] then
-                    return TriggerClientEvent("ox_lib:notify", source, {
-                        title = "You are not permitted to change this radio channel name!",
-                        type = "error",
-                        duration = 5000
-                    })
+                    return Config.Notification(source, "You are not permitted to change this radio channel name!", "error")
                 end
                 customRadioNames[tostring(currentRadioChannel)] = customizedName
                 for player in pairs(pma_voice:getPlayersInRadioChannel(currentRadioChannel)) do
                     refreshRadioForPlayer(player)
-                    TriggerClientEvent("ox_lib:notify", player, {
-                        title = ("Player %s changed the radio channel(%s)'s name to %s"):format(Player(source).state[Shared.State.nameInRadio], currentRadioChannel, customizedName),
-                        type = "inform",
-                        duration = 5000
-                    })
+                    Config.Notification(player, ("Player %s changed the radio channel(%s)'s name to %s"):format(Player(source).state[Shared.State.nameInRadio], currentRadioChannel, customizedName))
                 end
             end
         end
