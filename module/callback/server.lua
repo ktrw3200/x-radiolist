@@ -1,5 +1,5 @@
 -- all credit for this callback module goes to overextended team (https://github.com/overextended/ox_lib/blob/master/imports/callback/server.lua)
-local events = {}
+callback = {}
 local cbEvent = ("__x-radiolist_cb_%s")
 
 local function callbackResponse(success, result, ...)

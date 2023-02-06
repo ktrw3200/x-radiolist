@@ -33,5 +33,5 @@ Config.Notification = function(source, message, type)
     TriggerClientEvent("ox_lib:notify", source, {title = message, type = type or "inform", duration = 5000})
     -- TriggerClientEvent("t-notify:client:Custom", source, {title = message, style = type or "info", duration = 5000})
     -- TriggerClientEvent("esx:showNotification", source, message, type or "info", 5000)
-    -- TriggerClientEvent("QBCore:Notify", source, message, type or "primary" or type, 5000)
+    -- TriggerClientEvent("QBCore:Notify", source, message, type or "primary", 5000)
 end

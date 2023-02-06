@@ -1,4 +1,5 @@
 -- all credit for this callback module goes to overextended team (https://github.com/overextended/ox_lib/blob/master/imports/callback/client.lua)
+callback = {}
 local events = {}
 local timers = {}
 local cbEvent = ("__x-radiolist_cb_%s")
