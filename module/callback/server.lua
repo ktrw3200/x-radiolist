@@ -24,6 +24,3 @@ function callback.register(name, cb)
 		TriggerClientEvent(cbEvent:format(resource), source, key, callbackResponse(pcall(cb, source, ...)))
 	end)
 end
-
-return callback
-
