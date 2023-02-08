@@ -1,10 +1,10 @@
 local playerServerID = GetPlayerServerId(PlayerId())
-local currentRadioChannel, currentRadioChannelName = nil, nil
+local playersInRadio, currentRadioChannel, currentRadioChannelName = {}, nil, nil
 local radioListVisibility = true
 
 local function closeTheRadioList()
+    playersInRadio, currentRadioChannel, currentRadioChannelName = {}, nil, nil
     SendNUIMessage({ clearRadioList = true })
-    currentRadioChannel, currentRadioChannelName = nil, nil
 end
 
 local function modifyTheRadioListVisibility(state)
@@ -13,37 +13,46 @@ end
 
 local function addServerIdToPlayerName(serverId, playerName)
     if Config.ShowPlayersServerIdNextToTheirName then
-        if Config.PlayerServerIdPosition == "left" then playerName = ("(%s) %s"):format(serverId, playerName)
-        elseif Config.PlayerServerIdPosition == "right" then playerName = ("%s (%s)"):format(playerName, serverId) end
+        if Config.PlayerServerIdPosition == "left" then playerName = ("%s-%s"):format(serverId, playerName)
+        elseif Config.PlayerServerIdPosition == "right" then playerName = ("%s-%s"):format(playerName, serverId) end
     end
     return playerName
 end
 
+local function addPlayerToTheRadioList(playerId, playerName)
+    if playersInRadio[playerId] then return end
+    playersInRadio[playerId] = addServerIdToPlayerName(playerId, playerName or Player(playerId).state[Shared.State.nameInRadio] or callback.await(Shared.Callback.getPlayerName, false, playerId))
+    SendNUIMessage({ self = playerId == playerServerID, radioId = playerId, radioName = playersInRadio[playerId], channel = currentRadioChannelName })
+end
+
+local function removePlayerFromTheRadioList(playerId)
+    if not playersInRadio[playerId] then return end
+    if playerId == playerServerID then
+        closeTheRadioList()
+    else
+        playersInRadio[playerId] = nil
+        SendNUIMessage({ radioId = playerId })
+    end
+end
+
 RegisterNetEvent("pma-voice:addPlayerToRadio", function(playerId)
-    if not currentRadioChannel or not (currentRadioChannel > 0) or playerId == playerServerID then return end
-    local playerName = Player(playerId).state[Shared.State.nameInRadio] or callback.await(Shared.Callback.getPlayerName, false, playerId)
-    playerName = addServerIdToPlayerName(playerId, playerName)
-    SendNUIMessage({ radioId = playerId, radioName = playerName, channel = currentRadioChannelName })
+    if not currentRadioChannel or not (currentRadioChannel > 0) then return end
+    addPlayerToTheRadioList(playerId)
 end)
 
 RegisterNetEvent("pma-voice:removePlayerFromRadio", function(playerId)
     if not currentRadioChannel or not (currentRadioChannel > 0) then return end
-    if playerId == playerServerID then
-        closeTheRadioList()
-    else
-        SendNUIMessage({ radioId = playerId })
-    end
+    removePlayerFromTheRadioList(playerId)
 end)
 
 RegisterNetEvent("pma-voice:syncRadioData", function()
     closeTheRadioList()
-    local playersInRadio
-    playersInRadio, currentRadioChannel, currentRadioChannelName = callback.await(Shared.Callback.getPlayersInRadio, false)
-    for playerId, playerName in pairs(playersInRadio) do
-        playerName = addServerIdToPlayerName(playerId, playerName)
-        SendNUIMessage({ self = playerId == playerServerID, radioId = playerId, radioName = playerName, channel = currentRadioChannelName })
+    local _playersInRadio
+    _playersInRadio, currentRadioChannel, currentRadioChannelName = callback.await(Shared.Callback.getPlayersInRadio, false)
+    for playerId, playerName in pairs(_playersInRadio) do
+        addPlayerToTheRadioList(playerId, playerName)
     end
-    playersInRadio = nil
+    _playersInRadio = nil
 end)
 
 -- set talkingState on radio for self
