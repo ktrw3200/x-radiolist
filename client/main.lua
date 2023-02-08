@@ -36,6 +36,7 @@ RegisterNetEvent("pma-voice:removePlayerFromRadio", function(playerId)
 end)
 
 RegisterNetEvent("pma-voice:syncRadioData", function()
+    if currentRadioChannel and currentRadioChannel > 0 then return end
     closeTheRadioList()
     local playersInRadio
     playersInRadio, currentRadioChannel, currentRadioChannelName = callback.await(Shared.Callback.getPlayersInRadio, false)
