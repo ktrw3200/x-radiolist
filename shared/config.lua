@@ -7,8 +7,8 @@ Config.RadioListVisibilityCommand = "radiolist"         -- Only works if Config.
 Config.HideRadioListVisibilityByDefault = false         -- If set to true and a player joins the server, don't show the radio list until the player execute the Config.RadioListVisibilityCommand command
 
 Config.LetPlayersSetTheirOwnNameInRadio = true          -- Let players to customize how their name is displayed on the list
-Config.ResetPlayersCustomizedNameOnExit = true          -- Only works if Config.LetPlayersSetTheirOwnNameInRadio is set to true - Removes customized name players set for themselves on their server exit
 Config.RadioListChangeNameCommand = "nameinradio"       -- Only works if Config.LetPlayersSetTheirOwnNameInRadio is set to true
+Config.ResetPlayersCustomizedNameOnExit = true          -- Resets customized name players set for themselves on their server exit
 
 Config.LetPlayersChangeRadioChannelsName = true         -- Let players to change the name of the radio channels **they are currently joined in**
 Config.ModifyRadioChannelNameCommand = "nameofradio"    -- Changes the name of the radio channel **that the player is currently joined in** => this is a validation to prevent normal players from modifying the name of the restricted channels they don't have access to(such as police, & etc)
@@ -16,12 +16,18 @@ Config.ModifyRadioChannelNameCommand = "nameofradio"    -- Changes the name of t
 Config.ShowPlayersServerIdNextToTheirName = true        -- Shows the players' server id next to their name on the radio list
 Config.PlayerServerIdPosition = "right"                 -- Position of player's server id next to their name on the radio list ("right" or "left") => Only works if Config.ShowPlayersServerIdNextToTheirName is set to true
 
-Config.JobsWithCallsign = {                             -- It only detects callsign if your framework is "qb"
+Config.RadioListOnlyShowsToGroupsWithAccess = false     -- If true, the radio list only shows to Config.GroupsWithAccessToTheRadioList
+Config.GroupsWithAccessToTheRadioList = {               -- For ESX it checks if the players' job name matches with any of these groups - For QB it checks if the players' gang name matches and/or if the players' job name matches and they are onduty...
     ["police"] = true,
     ["ambulance"] = true,
 }
 
-Config.LetPlayersOverrideRadioChannelsWithName = false  -- Let player change the name of radio channels that are in Config.RadioChannelsWithName => Only works if Config.LetPlayersChangeRadioChannelsName is set to true
+Config.JobsWithCallsign = {                             -- It only detects callsign if the framework is "QB"
+    ["police"] = true,
+    ["ambulance"] = true,
+}
+
+Config.LetPlayersOverrideRadioChannelsWithName = false  -- Let players change the name of radio channels that are in Config.RadioChannelsWithName => Only works if Config.LetPlayersChangeRadioChannelsName is set to true
 
 Config.RadioChannelsWithName = {
     ["0"] = "Admin",                                    -- Every channels between 0 and 1 will be named "Admin"

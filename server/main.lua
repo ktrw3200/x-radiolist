@@ -36,14 +36,6 @@ if Config.UseRPName then
             end
             return response
         end
-    elseif GetResourceState("JLRP-Framework"):find("start") then
-        Framework.Object = exports["JLRP-Framework"]:getSharedObject()
-        Framework.Initial = "jlrp"
-        Framework.GetPlayer = Framework.Object.GetPlayerFromId
-        Framework.GetPlayerName = function(source)
-            local xPlayer = Framework.GetPlayer(source)
-            return xPlayer and xPlayer.getName() or nil
-        end
     end
     Framework.Object = nil -- free up the memory
 end
@@ -93,6 +85,10 @@ end
 
 local function getRadioChannelName(radioChannel)
     return customRadioNames[tostring(radioChannel)] or Config.RadioChannelsWithName[tostring(math.floor(radioChannel))] or radioChannel
+end
+
+local function modifyPermissionToSeeRadioList(source, state)
+    Player(source).state:set(Shared.State.allowedToSeeRadioList, state, true)
 end
 
 callback.register(Shared.Callback.getPlayersInRadio, function(source, radioChannel)
@@ -150,7 +146,40 @@ if Config.LetPlayersChangeRadioChannelsName then
     end, false)
 end
 
-if Framework.Initial == "qb" then
+local function onPlayerDropped(source)
+    if Config.ResetPlayersCustomizedNameOnExit then
+        local playerIdentifier = getPlayerIdentifier(source)
+        if customPlayerNames[playerIdentifier] then
+            customPlayerNames[playerIdentifier] = nil
+            Player(source).state:set(Shared.State.nameInRadio, nil, true)
+        end
+    end
+    Player(source).state:set(Shared.State.callsignIsSet, nil)
+end
+
+AddEventHandler("playerDropped", function()
+    onPlayerDropped(source)
+end)
+
+if Framework.Initial == "esx" then
+    AddEventHandler("esx:playerLoaded", function(playerId, xPlayer, _)
+        if Config.RadioListOnlyShowsToGroupsWithAccess then
+            local allowedToSeeRadioList = Config.GroupsWithAccessToTheRadioList[xPlayer?.getJob()?.name]
+            modifyPermissionToSeeRadioList(playerId, allowedToSeeRadioList)
+        end
+    end)
+
+    AddEventHandler("esx:setJob", function(source, job, _)
+        if Config.RadioListOnlyShowsToGroupsWithAccess then
+            local allowedToSeeRadioList = Config.GroupsWithAccessToTheRadioList[job?.name]
+            modifyPermissionToSeeRadioList(source, allowedToSeeRadioList)
+        end
+    end)
+
+    AddEventHandler("esx:playerDropped", function(source)
+        onPlayerDropped(source)
+    end)
+elseif Framework.Initial == "qb" then
     AddEventHandler("QBCore:Player:SetPlayerData", function(playerData)
         local source = playerData.source
         if not source then return end
@@ -163,15 +192,13 @@ if Framework.Initial == "qb" then
             resetPlayerName(source)
             Player(source).state:set(Shared.State.callsignIsSet, false)
         end
+        if Config.RadioListOnlyShowsToGroupsWithAccess then
+            local allowedToSeeRadioList = (Config.GroupsWithAccessToTheRadioList[playerData.job?.name] and playerData.job?.onduty) or Config.GroupsWithAccessToTheRadioList[playerData.gang?.name]
+            modifyPermissionToSeeRadioList(source, allowedToSeeRadioList)
+        end
+    end)
+
+    AddEventHandler("QBCore:Server:OnPlayerUnload", function(source)
+        onPlayerDropped(source)
     end)
 end
-
-AddEventHandler("playerDropped", function()
-    local source = source
-    if Config.LetPlayersSetTheirOwnNameInRadio and Config.ResetPlayersCustomizedNameOnExit then
-        local playerIdentifier = getPlayerIdentifier(source)
-        if customPlayerNames[playerIdentifier] then
-            customPlayerNames[playerIdentifier] = nil
-        end
-    end
-end)

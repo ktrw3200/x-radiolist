@@ -23,6 +23,7 @@
 * Config to show radio members server id next to their name on the list
 * Ability to use QB callsign metadata as name on radio while on duty
 * Ability to let players change/override the name of radio channels that are defined in Config.RadioChannelsWithName
+* Ability to let only players with certain groups/job/gang see the radio list
 * ~~Let admins see the members of each radio frequency~~ (<b>TODO...</b>)
 
 <hr>

@@ -14,6 +14,8 @@ Shared.State.nameInRadio = ("%s_nameInRadio"):format(Shared.currentResourceName)
 
 Shared.State.callsignIsSet = ("%s_callsignIsSet"):format(Shared.currentResourceName)
 
+Shared.State.allowedToSeeRadioList = ("%s_allowedToSeeRadioList"):format(Shared.currentResourceName)
+
 function dumpTable(table, nb)
     if nb == nil then
         nb = 0

@@ -1,6 +1,6 @@
 local playerServerID = GetPlayerServerId(PlayerId())
 local playersInRadio, currentRadioChannel, currentRadioChannelName = {}, nil, nil
-local radioListVisibility = true
+local allowedToSeeRadioList, radioListVisibility = true, true
 
 local function closeTheRadioList()
     playersInRadio, currentRadioChannel, currentRadioChannelName = {}, nil, nil
@@ -8,13 +8,13 @@ local function closeTheRadioList()
 end
 
 local function modifyTheRadioListVisibility(state)
-    SendNUIMessage({ changeVisibility = true, visible = state })
+    SendNUIMessage({ changeVisibility = true, visible = (allowedToSeeRadioList and state) or false })
 end
 
 local function addServerIdToPlayerName(serverId, playerName)
     if Config.ShowPlayersServerIdNextToTheirName then
-        if Config.PlayerServerIdPosition == "left" then playerName = ("%s-%s"):format(serverId, playerName)
-        elseif Config.PlayerServerIdPosition == "right" then playerName = ("%s-%s"):format(playerName, serverId) end
+        if Config.PlayerServerIdPosition == "left" then playerName = ("%s) %s"):format(serverId, playerName)
+        elseif Config.PlayerServerIdPosition == "right" then playerName = ("%s (%s"):format(playerName, serverId) end
     end
     return playerName
 end
@@ -65,6 +65,13 @@ end)
 RegisterNetEvent("pma-voice:setTalkingOnRadio")
 AddEventHandler("pma-voice:setTalkingOnRadio", function(source, talkingState)
     SendNUIMessage({ radioId = source, radioTalking = talkingState })
+end)
+
+AddStateBagChangeHandler(Shared.State.allowedToSeeRadioList, ("player:%s"):format(playerServerID), function(bagName, key, value)
+    local receivedPlayerServerId = tonumber(bagName:gsub('player:', ''), 10)
+    if not receivedPlayerServerId or receivedPlayerServerId ~= playerServerID then return end
+    allowedToSeeRadioList = (value == nil and false) or value
+    modifyTheRadioListVisibility(radioListVisibility)
 end)
 
 if Config.LetPlayersChangeVisibilityOfRadioList then
