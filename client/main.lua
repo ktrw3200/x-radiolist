@@ -36,7 +36,7 @@ local function removePlayerFromTheRadioList(playerId)
 end
 
 RegisterNetEvent("pma-voice:addPlayerToRadio", function(playerId)
-    if not currentRadioChannel or not (currentRadioChannel > 0) then return end
+    if not currentRadioChannel or not (currentRadioChannel > 0) or playerId == playerServerID then return end
     addPlayerToTheRadioList(playerId)
 end)
 
