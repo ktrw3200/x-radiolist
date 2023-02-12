@@ -71,7 +71,7 @@ end
 local function getPlayerName(source)
     local playerName = Player(source).state[Shared.State.nameInRadio]
     if not playerName then
-        playerName = (Config.UseRPName and (Framework.GetPlayerName(source) or GetPlayerName(source))) or (not Config.UseRPName and GetPlayerName(source))
+        playerName = customPlayerNames[getPlayerIdentifier(source)] or (Config.UseRPName and Framework.GetPlayerName(source)) or GetPlayerName(source)
         setPlayerName(source, playerName)
     end
     return playerName
