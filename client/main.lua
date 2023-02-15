@@ -1,7 +1,7 @@
 local playerServerID = GetPlayerServerId(PlayerId())
 local playersInRadio, currentRadioChannel, currentRadioChannelName = {}, nil, nil
 local allowedToSeeRadioList, radioListVisibility = true, true
-local temporaryName = "temporaryPlayerNameAsAWorkaroundForABugInPMA-VOICEWhichEventsGetCalledTwiceWhileThePlayerConnectsToTheRadioForFirsTime"
+local temporaryName = "temporaryPlayerNameAsAWorkaroundForABugInPMA-VOICEWhichEventsGetCalledTwiceWhileThePlayerConnectsToTheRadioForFirstTime"
 
 local function closeTheRadioList()
     playersInRadio, currentRadioChannel, currentRadioChannelName = {}, nil, nil
@@ -37,7 +37,6 @@ end
 
 RegisterNetEvent("pma-voice:addPlayerToRadio", function(playerId)
     if not currentRadioChannel or not (currentRadioChannel > 0) then return end
-    print("pma-voice:addPlayerToRadio", playerId)
     addPlayerToTheRadioList(playerId)
 end)
 
@@ -53,7 +52,6 @@ RegisterNetEvent("pma-voice:syncRadioData", function()
     for playerId, playerName in pairs(_playersInRadio) do
         addPlayerToTheRadioList(playerId, playerName)
     end
-    print("pma-voice:syncRadioData", dumpTable(_playersInRadio))
     _playersInRadio = nil
 end)
 
