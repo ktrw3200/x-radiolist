@@ -1,6 +1,7 @@
 local playerServerID = GetPlayerServerId(PlayerId())
 local playersInRadio, currentRadioChannel, currentRadioChannelName = {}, nil, nil
 local allowedToSeeRadioList, radioListVisibility = true, true
+local temporaryName = "temporaryPlayerNameAsAWorkaroundForABugInPMA-VOICEWhichEventsGetCalledTwiceWhileThePlayerConnectsToTheRadioForFirsTime"
 
 local function closeTheRadioList()
     playersInRadio, currentRadioChannel, currentRadioChannelName = {}, nil, nil
@@ -21,22 +22,22 @@ end
 
 local function addPlayerToTheRadioList(playerId, playerName)
     if playersInRadio[playerId] then return end
+    playersInRadio[playerId] = temporaryName
     playersInRadio[playerId] = addServerIdToPlayerName(playerId, playerName or Player(playerId).state[Shared.State.nameInRadio] or callback.await(Shared.Callback.getPlayerName, false, playerId))
     SendNUIMessage({ self = playerId == playerServerID, radioId = playerId, radioName = playersInRadio[playerId], channel = currentRadioChannelName })
 end
 
 local function removePlayerFromTheRadioList(playerId)
     if not playersInRadio[playerId] then return end
-    if playerId == playerServerID then
-        closeTheRadioList()
-    else
-        playersInRadio[playerId] = nil
-        SendNUIMessage({ radioId = playerId })
-    end
+    if playerId == playerServerID then closeTheRadioList() return end
+    if playersInRadio[playerId] == temporaryName then return end
+    playersInRadio[playerId] = nil
+    SendNUIMessage({ radioId = playerId })
 end
 
 RegisterNetEvent("pma-voice:addPlayerToRadio", function(playerId)
-    if not currentRadioChannel or not (currentRadioChannel > 0) or playerId == playerServerID then return end
+    if not currentRadioChannel or not (currentRadioChannel > 0) then return end
+    print("pma-voice:addPlayerToRadio", playerId)
     addPlayerToTheRadioList(playerId)
 end)
 
@@ -52,6 +53,7 @@ RegisterNetEvent("pma-voice:syncRadioData", function()
     for playerId, playerName in pairs(_playersInRadio) do
         addPlayerToTheRadioList(playerId, playerName)
     end
+    print("pma-voice:syncRadioData", dumpTable(_playersInRadio))
     _playersInRadio = nil
 end)
 
