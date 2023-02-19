@@ -29,8 +29,8 @@ end
 
 local function removePlayerFromTheRadioList(playerId)
     if not playersInRadio[playerId] then return end
-    if playerId == playerServerID then closeTheRadioList() return end
     if playersInRadio[playerId] == temporaryName then return end
+    if playerId == playerServerID then closeTheRadioList() return end
     playersInRadio[playerId] = nil
     SendNUIMessage({ radioId = playerId })
 end
