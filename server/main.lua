@@ -157,8 +157,23 @@ local function onPlayerDropped(source)
     Player(source).state:set(Shared.State.callsignIsSet, nil)
 end
 
+local function onResourceStopped(resource)
+    if resource ~= Shared.currentResourceName then return end
+    for _, source in pairs(GetPlayers()) do
+        onPlayerDropped(source)
+    end
+end
+
 AddEventHandler("playerDropped", function()
     onPlayerDropped(source)
+end)
+
+AddEventHandler("onResourceStop", function(resource)
+    onResourceStopped(resource)
+end)
+
+AddEventHandler("onServerResourceStop", function(resource)
+    onResourceStopped(resource)
 end)
 
 if Framework.Initial == "esx" then
