@@ -17,7 +17,7 @@
 ### Changes in compare to <a href='https://github.com/mahanmoulaei/JLRP-RadioList'>JLRP-RadioList</a>
 * Performance increase
 * Bug fixes
-* Complete re-write of the code + make it more readable
+* Complete re-write of the code + more readability
 * Config to hide radio list visibility by default
 * Config to let players modify name of the radio channels
 * Config to show radio members server id next to their name on the list
