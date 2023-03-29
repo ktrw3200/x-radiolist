@@ -84,7 +84,7 @@ local function resetPlayerName(source)
 end
 
 local function getRadioChannelName(radioChannel)
-    return customRadioNames[tostring(radioChannel)] or Config.RadioChannelsWithName[tostring(math.floor(radioChannel))] or radioChannel
+    return customRadioNames[tostring(radioChannel)] or Config.RadioChannelsWithName[tostring(radioChannel)] or Config.RadioChannelsWithName[tostring(math.floor(radioChannel))] or radioChannel
 end
 
 local function modifyPermissionToSeeRadioList(source, state)
