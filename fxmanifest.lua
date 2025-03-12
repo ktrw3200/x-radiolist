@@ -8,10 +8,12 @@ version     "0.9.8"
 repository  "https://github.com/XProject/x-radiolist"
 description "Project-X Radio List : List of players in each radio channels to be used with PMA-VOICE"
 
-ui_page "web/index.html"
+ui_page "web/build/index.html"
 
 files {
-    "web/index.html"
+    "web/build/index.html",
+    "web/build/index.css",
+    "web/build/index.js",
 }
 
 shared_scripts {
